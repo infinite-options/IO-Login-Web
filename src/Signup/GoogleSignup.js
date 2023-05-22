@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Col, Container, Form, Modal, Row, Button } from "react-bootstrap";
 import axios from "axios";
 import { formatPhoneNumber } from "../helper";
+import UserAlreadyExistsModal from "./UserAlreadyExistsModal";
+import { boldSmall } from "../styles";
 
 let CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 let CLIENT_SECRET = process.env.REACT_APP_GOOGLE_CLIENT_SECRET;
@@ -11,7 +13,6 @@ let SCOPES =
   "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile";
 
 function GoogleSignup(props) {
-  const { socialSignUpModalShow, setSocialSignUpModalShow } = props;
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -21,6 +22,8 @@ function GoogleSignup(props) {
   const [refreshToken, setRefreshToken] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [accessExpiresIn, setAccessExpiresIn] = useState("");
+  const [signupSuccessful, setSignupSuccessful] = useState(false);
+  const [userAlreadyExists, setUserAlreadyExists] = useState(false);
 
   let codeClient = {};
 
@@ -110,20 +113,35 @@ function GoogleSignup(props) {
                       const user = {
                         email: e,
                         password: GOOGLE_LOGIN,
-                        first_name: props.first_name,
-                        last_name: props.last_name,
-                        phone_number: props.phone_number,
-                        role: props.role,
+                        first_name: firstName,
+                        last_name: lastName,
+                        role: "",
+                        phone_number: phoneNumber,
                         google_auth_token: at,
                         google_refresh_token: rt,
                         social_id: si,
                         access_expires_in: ax,
                       };
                       // console.log(user);
+                      axios
+                        .post(
+                          "http://127.0.0.1:2000/api/v2/UserSocialSignUp/FINDME",
+                          user
+                        )
+                        .then((response) => {
+                          console.log(response);
+                          if (response.data.message == "User already exists") {
+                            setUserAlreadyExists(!userAlreadyExists);
+                            return;
+                            // add validation
+                          } else {
+                            setSignupSuccessful(true);
+                          }
+                        });
                       // const response = await post("/userSocialSignup", user);
                       // // console.log(response);
                       // if (response.message == "User already exists") {
-                      //   setSocialSignUpModalShow(!socialSignUpModalShow);
+                      //   setUserAlreadyExists(!userAlreadyExists);
                       //   return;
                       //   // add validation
                       // } else {
@@ -139,7 +157,7 @@ function GoogleSignup(props) {
                     console.log(error);
                   });
 
-                // setSocialSignUpModalShow(!socialSignUpModalShow);
+                // setUserAlreadyExists(!userAlreadyExists);
 
                 return (
                   accessToken, refreshToken, accessExpiresIn, email, socialId
@@ -153,78 +171,106 @@ function GoogleSignup(props) {
       });
     }
   }, [getAuthorizationCode]);
-
+  const onCancel = () => {
+    setUserAlreadyExists(false);
+  };
   return (
     <Container className="d-flex flex-column justify-content-center align-items-center ">
+      <UserAlreadyExistsModal
+        isOpen={userAlreadyExists}
+        onCancel={onCancel}
+        email={email}
+      />
       <Row className="mt-5 mb-3">Google Signup</Row>
-      <Row className="w-100">
-        <Col></Col>
-        <Col>
-          <Form>
-            <Row>
-              {" "}
-              <Col>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="First Name"
-                    name="email"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Last Name"
-                    name="email"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                placeholder="(xxx)xxx-xxxx"
-                type="tel"
-                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                name="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) =>
-                  setPhoneNumber(formatPhoneNumber(e.target.value))
-                }
-              />
-            </Form.Group>
-          </Form>
-          <div></div>
-          <div id="signUpDiv">
-            <Button
-              class="btn btn-outline-dark"
-              onClick={() => getAuthorizationCode()}
-              role="button"
-              style={{ textTransform: "none", borderRadius: "50px" }}
-            >
-              <img
-                width="20px"
-                style={{
-                  marginBottom: "3px",
-                  marginRight: "5px",
-                }}
-                alt="Google sign-in"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
-              />
-              Sign Up with Google
-            </Button>
-          </div>
-        </Col>
-        <Col></Col>
-      </Row>
+      {signupSuccessful ? (
+        <div>
+          <Row>
+            <div className="d-flex flex-column justify-content-start mt-5">
+              <div className="text-center">
+                <p style={boldSmall} className="mb-1">
+                  Signup Successful
+                </p>
+                <Button
+                  variant="primary"
+                  onClick={() => navigate("/login")}
+                  className="mb-4"
+                >
+                  Login
+                </Button>
+              </div>
+            </div>
+          </Row>
+        </div>
+      ) : (
+        <Row className="w-100">
+          <Col></Col>
+          <Col>
+            <Form>
+              <Row>
+                {" "}
+                <Col>
+                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="First Name"
+                      name="email"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Last Name"
+                      name="email"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  placeholder="(xxx)xxx-xxxx"
+                  type="tel"
+                  pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                  name="phoneNumber"
+                  value={phoneNumber}
+                  onChange={(e) =>
+                    setPhoneNumber(formatPhoneNumber(e.target.value))
+                  }
+                />
+              </Form.Group>
+            </Form>
+            <div></div>
+            <div id="signUpDiv">
+              <Button
+                class="btn btn-outline-dark"
+                onClick={() => getAuthorizationCode()}
+                role="button"
+                style={{ textTransform: "none", borderRadius: "50px" }}
+              >
+                <img
+                  width="20px"
+                  style={{
+                    marginBottom: "3px",
+                    marginRight: "5px",
+                  }}
+                  alt="Google sign-in"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+                />
+                Sign Up with Google
+              </Button>
+            </div>
+          </Col>
+          <Col></Col>
+        </Row>
+      )}
     </Container>
   );
 }
