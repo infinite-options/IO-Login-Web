@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { formatPhoneNumber } from "../helper";
 import { red, pillButton, boldSmall } from "../styles";
 import UserAlreadyExistsModal from "./UserAlreadyExistsModal";
-const eye = ""; //<FontAwesomeIcon icon={faEye} />;
+
 export default function EmailSignup() {
   const navigate = useNavigate();
 
@@ -61,23 +61,6 @@ export default function EmailSignup() {
           setSignupSuccessful(true);
         }
       });
-    //  const response = await post("/users", user);
-    //  if (response.message == "User already exists") {
-    //    setUserAlreadyExists(!userAlreadyExists);
-    //    return;
-    //    // add validation
-    //  } else {
-    //    if (response.code !== 200) {
-    //      setErrorMessage(response.message);
-    //      return;
-    //      // add validation
-    //    }
-    //    setErrorMessage("");
-    //    context.updateUserData(response.result);
-    //    // save to app state / context
-    //    setShowSpinner(false);
-    //    props.onConfirm();
-    //  }
   };
   const onCancel = () => {
     setUserAlreadyExists(false);

@@ -14,7 +14,6 @@ export default function UserAlreadyExistsModal(props) {
     <div>
       <Dialog
         open={isOpen}
-        // onClose={onCancel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >

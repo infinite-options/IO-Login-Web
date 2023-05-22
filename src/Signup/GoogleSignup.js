@@ -37,21 +37,17 @@ function GoogleSignup(props) {
     /* global google */
 
     if (window.google) {
-      // console.log("in here signup");
-      // console.log(CLIENT_ID, SCOPES);
       // initialize a code client for the authorization code flow.
       codeClient = google.accounts.oauth2.initCodeClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (tokenResponse) => {
-          // console.log(tokenResponse);
           // gets back authorization code
           if (tokenResponse && tokenResponse.code) {
             let auth_code = tokenResponse.code;
             let authorization_url =
               "https://accounts.google.com/o/oauth2/token";
 
-            // console.log("auth_code", auth_code);
             var details = {
               code: auth_code,
               client_id: CLIENT_ID,
@@ -59,7 +55,6 @@ function GoogleSignup(props) {
               redirectUri: "postmessage",
               grant_type: "authorization_code",
             };
-            // console.log(details);
             var formBody = [];
             for (var property in details) {
               var encodedKey = encodeURIComponent(property);
@@ -81,7 +76,6 @@ function GoogleSignup(props) {
               })
 
               .then((data) => {
-                // console.log(data);
                 let at = data["access_token"];
                 let rt = data["refresh_token"];
                 let ax = data["expires_in"];
@@ -97,13 +91,9 @@ function GoogleSignup(props) {
                       at
                   )
                   .then((response) => {
-                    // console.log(response.data);
-
                     let data = response.data;
-                    //setUserInfo(data);
+
                     let e = data["email"];
-                    let fn = data["given_name"];
-                    let ln = data["family_name"];
                     let si = data["id"];
 
                     setEmail(e);
@@ -122,7 +112,6 @@ function GoogleSignup(props) {
                         social_id: si,
                         access_expires_in: ax,
                       };
-                      // console.log(user);
                       axios
                         .post(
                           "http://127.0.0.1:2000/api/v2/UserSocialSignUp/FINDME",
@@ -138,27 +127,12 @@ function GoogleSignup(props) {
                             setSignupSuccessful(true);
                           }
                         });
-                      // const response = await post("/userSocialSignup", user);
-                      // // console.log(response);
-                      // if (response.message == "User already exists") {
-                      //   setUserAlreadyExists(!userAlreadyExists);
-                      //   return;
-                      //   // add validation
-                      // } else {
-                      //   context.updateUserData(response.result);
-                      //   // save to app state / context
-                      //   props.onConfirm();
-                      // }
                     };
                     socialGoogle();
                   })
                   .catch((error) => {
-                    // console.log("its in landing page");
                     console.log(error);
                   });
-
-                // setUserAlreadyExists(!userAlreadyExists);
-
                 return (
                   accessToken, refreshToken, accessExpiresIn, email, socialId
                 );
