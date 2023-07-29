@@ -24,9 +24,12 @@ export default function EmailLogin() {
     }
     setShowSpinner(true);
     axios
-      .post("http://127.0.0.1:2000/api/v2/AccountSalt/FINDME", {
-        email: email,
-      })
+      .post(
+        "https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/AccountSalt/FINDME",
+        {
+          email: email,
+        }
+      )
       .then((res) => {
         let saltObject = res;
         if (saltObject.data.code === 200) {
@@ -67,7 +70,7 @@ export default function EmailLogin() {
                 console.log(JSON.stringify(loginObject));
                 axios
                   .post(
-                    "http://127.0.0.1:2000/api/v2/Login/FINDME",
+                    "https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/Login/FINDME",
                     loginObject
                   )
                   .then((response) => {
@@ -108,9 +111,12 @@ export default function EmailLogin() {
     }
     setShowSpinner(true);
     axios
-      .post("http://127.0.0.1:2000/api/v2/SetTempPassword/FINDME", {
-        email: email,
-      })
+      .post(
+        "https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/SetTempPassword/FINDME",
+        {
+          email: email,
+        }
+      )
       .then((response) => {
         if (response.data.message === "A temporary password has been sent") {
           setErrorMessage("");

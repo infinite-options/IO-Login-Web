@@ -24,7 +24,9 @@ function GoogleLogin(props) {
       setNewEmail(email);
       let user_id = "";
       axios
-        .get(`http://127.0.0.1:2000/api/v2/UserToken/FINDME/${email}`)
+        .get(
+          `https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/UserToken/FINDME/${email}`
+        )
         .then((response) => {
           console.log(response["data"]["result"].length);
           if (response["data"]["result"].length === 0) {
@@ -80,7 +82,7 @@ function GoogleLogin(props) {
                     .then((data) => {
                       let at = data["access_token"];
                       setAccessToken(at);
-                      let url = `http://127.0.0.1:2000/api/v2/UpdateAccessToken/FINDME/${user_id}`;
+                      let url = `https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/UpdateAccessToken/FINDME/${user_id}`;
                       axios
                         .post(url, {
                           google_auth_token: at,
