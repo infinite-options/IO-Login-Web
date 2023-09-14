@@ -50,7 +50,10 @@ export default function EmailSignup() {
       role: "",
     };
     axios
-      .post("http://127.0.0.1:2000/api/v2/CreateAccount/FINDME", user)
+      .post(
+        "https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/CreateAccount/FINDME",
+        user
+      )
       .then((response) => {
         console.log(response);
         if (response.data.message == "User already exists") {

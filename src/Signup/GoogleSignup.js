@@ -114,7 +114,7 @@ function GoogleSignup(props) {
                       };
                       axios
                         .post(
-                          "http://127.0.0.1:2000/api/v2/UserSocialSignUp/FINDME",
+                          "https://mrle52rri4.execute-api.us-west-1.amazonaws.com/dev/api/v2/UserSocialSignUp/FINDME",
                           user
                         )
                         .then((response) => {
